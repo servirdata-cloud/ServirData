@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mostrar Datos JSON</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f8ff; /* Color de fondo suave */
+      color: #333;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 20px;
+      padding: 10px;
+      background-color: #4CAF50; /* Fondo verde para el título */
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .region {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #fff;
+      border-left: 10px solid #4CAF50; /* Borde verde para las regiones */
+      border-radius: 8px;
+      box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .region h2 {
+      color: #4CAF50;
+      font-size: 1.6em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .institucion {
+      margin-left: 20px;
+      background-color: #f9f9f9;
+      padding: 10px;
+      border-left: 6px solid #2196F3; /* Borde azul para las instituciones */
+      border-radius: 5px;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+      margin-bottom: 10px;
+    }
+
+    .institucion h3 {
+      font-size: 1.4em;
+      color: #2196F3;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 20px;
+    }
+
+    ul li {
+      background-color: #ffe082; /* Fondo amarillo suave para los puestos */
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-size: 1.1em;
+      color: #333;
+      box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    ul li:hover {
+      background-color: #ffcc00; /* Fondo amarillo más intenso cuando se pasa el ratón */
+    }
+
+    .error {
+      color: red;
+      font-size: 1.2em;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Datos de Instituciones y Puestos</h1>
+  <div id="datos"></div>
+  <div id="error" class="error"></div>
+
+  <script>
+    // Usamos fetch para cargar el archivo JSON
+    fetch('assets/datos.json')
+      .then(response => {
+        // Verificamos si la solicitud fue exitosa
+        if (!response.ok) {
+          throw new Error('Error al cargar el archivo JSON');
+        }
+        return response.json();  // Convertimos la respuesta a formato JSON
+      })
+      .then(data => {
+        // Llamamos a la función para renderizar los datos
+        renderizarDatos(data);
+      })
+      .catch(error => {
+        console.error('Hubo un problema con la solicitud Fetch:', error);
+        document.getElementById('error').textContent = 'No se pudo cargar los datos. Intenta nuevamente más tarde.';
+      });
+
+    // Función para renderizar los datos en HTML
+    function renderizarDatos(datos) {
+      const contenedor = document.getElementById('datos');
+      
+      // Recorremos las regiones del JSON
+      for (let region in datos) {
+        const regionDiv = document.createElement('div');
+        regionDiv.classList.add('region');
+        
+        const regionTitulo = document.createElement('h2');
+        regionTitulo.textContent = region;
+        regionDiv.appendChild(regionTitulo);
+
+        // Recorremos las instituciones de cada región
+        for (let institucion in datos[region]) {
+          const institucionDiv = document.createElement('div');
+          institucionDiv.classList.add('institucion');
+
+          const institucionTitulo = document.createElement('h3');
+          institucionTitulo.textContent = institucion;
+          institucionDiv.appendChild(institucionTitulo);
+
+          // Creamos la lista de puestos
+          const puestosLista = document.createElement('ul');
+          datos[region][institucion].forEach(puesto => {
+            const puestoItem = document.createElement('li');
+            puestoItem.textContent = puesto;
+            puestosLista.appendChild(puestoItem);
+          });
+          institucionDiv.appendChild(puestosLista);
+
+          regionDiv.appendChild(institucionDiv);
+        }
+
+        contenedor.appendChild(regionDiv);
+      }
+    }
+  </script>
+</body>
+</html>
